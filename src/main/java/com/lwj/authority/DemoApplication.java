@@ -23,4 +23,9 @@ public class DemoApplication {
     public String home() {
         return "hello spring boot";
     }
+
+    @RequestMapping("/hello")
+    public String hello() {
+        return "hello world";
+    }
 }
