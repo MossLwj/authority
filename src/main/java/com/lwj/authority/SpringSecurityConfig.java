@@ -1,6 +1,8 @@
 package com.lwj.authority;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +15,26 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
+
+    @Autowired
+    private MyUserService myUserService;
+
+
+    /**
+     * 通过缓存的方式做登陆验证，控制权限
+     * @param auth
+     * @throws Exception
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        //写死的方式，使用内存验证权限管理
+//        auth.inMemoryAuthentication().withUser("admin").password("123456").roles("ADMIN");
+//        auth.inMemoryAuthentication().withUser("demo").password("123456").roles("USER");
+        auth.userDetailsService(myUserService).passwordEncoder(new MyPasswordEncoder());
+        
+        auth.jdbcAuthentication().usersByUsernameQuery("").authoritiesByUsernameQuery("").passwordEncoder(new MyPasswordEncoder());
+    }
 
     /**
      * 设置哪些请求将被拦截；配置请求的模式
